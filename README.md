@@ -13,7 +13,7 @@ The architecture of the model is illustrated in the following diagram:
 In this pipeline:
 - Faces are detected and cropped from video frames using RetinaFace.
 - Audio is extracted from the video and transformed into a mel spectrogram.
-- The cropped face frames are passed to a TimeSformer model to extract spatio-temporal features (vector of size 1024).
+- The cropped face frames are passed to a TimeSformer model to extract spatio-temporal features (vector of size 768).
 - The mel spectrogram is processed by the SyncNet model to calculate audio-visual latency features (vector of size 8).
 - These feature vectors are concatenated and fed into a fully connected layer for classification.
 - The final output predicts whether the video is "real" or "fake."
@@ -116,18 +116,19 @@ Edit `config.json` to adjust paths, hyperparameters, and other settings. For exa
 
 ```json
 {
-    "root_path": "/path/to/project",
+    "max_clip_len": 16,
+    "face_detection_step": 64,
+    "frame_num": 16,
     "frame_size": 224,
-    "frame_num": 32,
+    "freq_num": 128,
     "resample_rate": 16000,
-    "face_detection_step": 4,
-    "max_clip_len": 10,
-    "train_batch_size": 4,
-    "submit_batch_size": 4,
+    "lr": 5e-3,
+    "seed": 100,
     "device": "cuda",
-    "seed": 42,
-    "epoch": 10,
-    "lr": 0.001
+    "train_batch_size": 2,
+    "submit_batch_size": 1,
+    "root_path": "/path/to/processed_data/",
+    "epoch": 32
 }
 ```
 
@@ -187,9 +188,6 @@ Our model achieved a ROC AUC score of **96.63%** on a test set of 1,500 videos p
 
 If two submissions have the same AUC, the one with the lower inference time will be ranked higher. Thus, performance optimization is also encouraged.
 
-### Ranking and Tie-break
-
-If two submissions have the same AUC, the one with the lower inference time will be ranked higher. Thus, performance optimization is also encouraged.
 
 ## Additional Notes
 
